@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div style="text-align: left">
         <el-container class="container">
             <el-header>
-                <el-input placeholder="请输入" class="input" v-model="city">
+                <el-input placeholder="请输入" @keydown.enter="click" class="input" v-model="city">
                     <template #title>城市名：</template>
                 </el-input>
             </el-header>
             <el-main class="main">
                 <div class="today">
-                    今天：
+                    <span>{{ city }}</span>今天：
                     <span>{{ this.todayData.weather ?? this.pic }}{{ this.todayData.temperature ?? this.plc }}</span>
                     <span style="margin-left: 20px;">{{ this.todayData.direct ?? this.plc }}</span>
                     <span style="margin-left: 100px;">{{ this.todayData.data ?? this.plc }}</span>
@@ -38,31 +38,65 @@
 </template>
 
 <script>
-
-import { reactive, ref } from 'vue'
+import { getCurrentInstance, ref } from 'vue'
+import { ElMessage } from 'element-plus';
 export default {
     name: 'App',
     components: {
 
     },
     setup() {
-        let city = ref('')
-        let todayData = reactive({
+        let city = ref('杭州')
+        let weatherData = ref({})
+        let todayData = ref({
             weather: '',
             direct: '',
             temperature: '',
             data: []
         })
-        let realtime = reactive({
+        let realtime = ref({
             temperature: '',
             info: '',
             direct: '',
             power: ''
         })
-        let futureData = reactive([])
-        let pic = ref('')
+        let futureData = ref([])
+        let pic = ref('暂无数据')
+        let plc = ref('')
 
-        return { city, todayData, pic, realtime, futureData }
+        return { city, todayData, pic, realtime, futureData, weatherData, plc }
+    },
+    methods: {
+        async requestData() {
+            let city = encodeURI(this.city)
+            let api = `/simpleWeather/query?city=${city}&key=aa6c8be7ab68b9417183d0daaf83e740`
+            await this.axios.get(api).then((resp) => {
+                let tempData = {"reason":"查询成功!","result":{"city":"杭州","realtime":{"temperature":"28","humidity":"84","info":"雷阵雨","wid":"04","direct":"东北风","power":"3级","aqi":"50"},"future":[{"date":"2024-09-10","temperature":"23/34℃","weather":"雷阵雨转中到大雨","wid":{"day":"04","night":"22"},"direct":"东北风转北风"},{"date":"2024-09-11","temperature":"25/30℃","weather":"小到中雨转小雨","wid":{"day":"21","night":"07"},"direct":"东北风转北风"},{"date":"2024-09-12","temperature":"26/33℃","weather":"雷阵雨转多云","wid":{"day":"04","night":"01"},"direct":"东南风转南风"},{"date":"2024-09-13","temperature":"24/33℃","weather":"晴","wid":{"day":"00","night":"00"},"direct":"东风"},{"date":"2024-09-14","temperature":"25/32℃","weather":"小雨","wid":{"day":"07","night":"07"},"direct":"东风转持续无风向"}]},"error_code":0}
+                console.log('response.data:', resp.data, ' data:', JSON.stringify(resp.data))
+                if (resp.data.error_code == 0) {
+                    this.weatherData = resp.data
+                    this.todayData = this.weatherData.result.future[0]
+                    this.realtime = this.weatherData.result.realtime
+                    this.futureData = this.weatherData.result.future
+                } else {
+                    ElMessage.warning(resp.data.reason)
+                    this.city = ''
+                    this.weatherData = tempData
+                    this.city = this.weatherData.result.city
+                    this.todayData = this.weatherData.result.future[0]
+                    this.realtime = this.weatherData.result.realtime
+                    this.futureData = this.weatherData.result.future
+                }
+            })
+        },
+        click() {
+            this.requestData()
+        }
+    },
+    mounted() {
+        const { proxy } = getCurrentInstance()
+        proxy.axios.defaults.baseURL = '/myApi'
+        this.requestData()
     }
 }
 </script>
