@@ -26,7 +26,9 @@ jobs:
       - name: 编译代码
         run: npm run build
 
-
+      - name: 查看dist是否生成
+        run: ls -al dist
+        
       - name: 部署到GitHub Page上面
         if: github.ref == 'refs/heads/master'
         run: |
