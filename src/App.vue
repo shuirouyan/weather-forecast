@@ -107,7 +107,7 @@ export default {
         },
         click() {
             this.requestData()
-            console.log('new date.')
+            console.log('new date.', new Date())
         }
     },
     mounted() {
