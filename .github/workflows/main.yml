@@ -34,7 +34,28 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add dist
-          git commit -m "Deploy to GitHub Pages"
-          git push -f https://${{ secrets.DEPLOY_TOKEN }}@github.com/${{ github.repository }} master:gh-pages
       
+          # 初始化一个新的临时目录
+          mkdir gh-pages-branch
+          cd gh-pages-branch
+      
+          # 初始化 gh-pages 分支
+          git init
+          git remote add origin https://github.com/${{ github.repository }}.git
+          git fetch origin gh-pages || echo "gh-pages branch does not exist yet"
+          git checkout gh-pages || git checkout --orphan gh-pages
+      
+          # 清空所有旧的文件
+          rm -rf *
+      
+          # 将构建后的文件从 dist 目录复制过来
+          cp -r ../dist/* .
+      
+          # 强制添加被 .gitignore 忽略的 dist 文件夹
+          git add -f .
+      
+          # 提交新文件
+          git commit -m "Deploy to GitHub Pages"
+      
+          # 强制推送到 gh-pages 分支
+          git push -f https://${{ secrets.DEPLOY_TOKEN }}@github.com/${{ github.repository }} gh-pages
