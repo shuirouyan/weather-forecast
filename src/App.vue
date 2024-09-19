@@ -72,8 +72,8 @@ export default {
 
             let city = encodeURI(this.city)
             let api = `/simpleWeather/query?city=${city}&key=aa6c8be7ab68b9417183d0daaf83e740`
+            let tempData = { "reason": "查询成功!", "result": { "city": "杭州", "realtime": { "temperature": "28", "humidity": "84", "info": "雷阵雨", "wid": "04", "direct": "东北风", "power": "3级", "aqi": "50" }, "future": [{ "date": "2024-09-10", "temperature": "23/34℃", "weather": "雷阵雨转中到大雨", "wid": { "day": "04", "night": "22" }, "direct": "东北风转北风" }, { "date": "2024-09-11", "temperature": "25/30℃", "weather": "小到中雨转小雨", "wid": { "day": "21", "night": "07" }, "direct": "东北风转北风" }, { "date": "2024-09-12", "temperature": "26/33℃", "weather": "雷阵雨转多云", "wid": { "day": "04", "night": "01" }, "direct": "东南风转南风" }, { "date": "2024-09-13", "temperature": "24/33℃", "weather": "晴", "wid": { "day": "00", "night": "00" }, "direct": "东风" }, { "date": "2024-09-14", "temperature": "25/32℃", "weather": "小雨", "wid": { "day": "07", "night": "07" }, "direct": "东风转持续无风向" }] }, "error_code": 0 }
             await this.axios.get(api).then((resp) => {
-                let tempData = { "reason": "查询成功!", "result": { "city": "杭州", "realtime": { "temperature": "28", "humidity": "84", "info": "雷阵雨", "wid": "04", "direct": "东北风", "power": "3级", "aqi": "50" }, "future": [{ "date": "2024-09-10", "temperature": "23/34℃", "weather": "雷阵雨转中到大雨", "wid": { "day": "04", "night": "22" }, "direct": "东北风转北风" }, { "date": "2024-09-11", "temperature": "25/30℃", "weather": "小到中雨转小雨", "wid": { "day": "21", "night": "07" }, "direct": "东北风转北风" }, { "date": "2024-09-12", "temperature": "26/33℃", "weather": "雷阵雨转多云", "wid": { "day": "04", "night": "01" }, "direct": "东南风转南风" }, { "date": "2024-09-13", "temperature": "24/33℃", "weather": "晴", "wid": { "day": "00", "night": "00" }, "direct": "东风" }, { "date": "2024-09-14", "temperature": "25/32℃", "weather": "小雨", "wid": { "day": "07", "night": "07" }, "direct": "东风转持续无风向" }] }, "error_code": 0 }
                 console.log('response.data:', resp.data, ' data:', JSON.stringify(resp.data))
                 this.num += 1
                 if (resp.data.error_code == 0) {
@@ -94,8 +94,9 @@ export default {
                     this.realtime = this.weatherData.result.realtime
                     this.futureData = this.weatherData.result.future
                 }
-            }).catch((res) => {
-                ElMessage({ type: 'error', message: this.city + '天气查询，' + resp.data.reason + 'res:' + res, duration: 5000 })
+            }).catch(error => {
+                console.log(error)
+                ElMessage({ type: 'error', message: this.city + '天气查询，' + 'res:' + error, duration: 5000 })
                 this.city = '杭州'
                 this.weatherData = tempData
                 this.city = this.weatherData.result.city
