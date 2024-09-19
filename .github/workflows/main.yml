@@ -11,14 +11,9 @@ on:
 
 jobs:
   build:
-    runs-on: unbuntu-last
+    runs-on: ubuntu-latest
 
     steps:
     - name: 检查代码
       uses: actions/checkout@v4
-    - name: 执行
-      uses: actions/setun-node@v2
-
-    - name: 完毕
-      run: echo "finish."
       
