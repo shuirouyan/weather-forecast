@@ -98,6 +98,7 @@ export default {
         },
         click() {
             this.requestData()
+            console.log('new date.')
         }
     },
     mounted() {
