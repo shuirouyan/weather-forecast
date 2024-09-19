@@ -103,7 +103,8 @@ export default {
     },
     mounted() {
         const { proxy } = getCurrentInstance()
-        proxy.axios.defaults.baseURL = '/myApi'
+        // proxy.axios.defaults.baseURL = '/myApi'
+        proxy.axios.defaults.baseURL = 'http://apis.juhe.cn'
         this.requestData()
     }
 }
