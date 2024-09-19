@@ -1,0 +1,61 @@
+name: vue CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查代码
+        uses: actions/checkout@v2
+
+      - name: 设置node环境
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: 安装依赖
+        run: npm install
+      - name: 编译代码
+        run: npm run build
+
+      - name: 查看dist是否生成
+        run: ls -al dist
+        
+      - name: 部署到GitHub Page上面
+        if: github.ref == 'refs/heads/master'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+      
+          # 初始化一个新的临时目录
+          mkdir gh-pages-branch
+          cd gh-pages-branch
+      
+          # 初始化 gh-pages 分支
+          git init
+          git remote add origin https://github.com/${{ github.repository }}.git
+          git fetch origin gh-pages || echo "gh-pages branch does not exist yet"
+          git checkout gh-pages || git checkout --orphan gh-pages
+      
+          # 清空所有旧的文件
+          rm -rf *
+      
+          # 将构建后的文件从 dist 目录复制过来
+          cp -r ../dist/* .
+      
+          # 强制添加被 .gitignore 忽略的 dist 文件夹
+          git add -f .
+      
+          # 提交新文件
+          git commit -m "Deploy to GitHub Pages"
+      
+          # 强制推送到 gh-pages 分支
+          git push -f https://${{ secrets.DEPLOY_TOKEN }}@github.com/${{ github.repository }} gh-pages
