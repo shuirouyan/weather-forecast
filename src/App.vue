@@ -94,6 +94,14 @@ export default {
                     this.realtime = this.weatherData.result.realtime
                     this.futureData = this.weatherData.result.future
                 }
+            }).catch((res) => {
+                ElMessage({ type: 'error', message: this.city + '天气查询，' + resp.data.reason + 'res:' + res, duration: 5000 })
+                this.city = '杭州'
+                this.weatherData = tempData
+                this.city = this.weatherData.result.city
+                this.todayData = this.weatherData.result.future[0]
+                this.realtime = this.weatherData.result.realtime
+                this.futureData = this.weatherData.result.future
             })
         },
         click() {
